@@ -105,24 +105,7 @@ func (r *Request) HashEndpoint() string {
 	// check for reaction endpoints, convert emoji identifier to {emoji}
 	reactionPrefixMatch := regexpURLReactionPrefix.FindAllString(buffer, -1)
 	if reactionPrefixMatch != nil {
-		if regexpURLReactionEmoji.FindAllString(buffer, -1) != nil {
-			reactionEmojis := regexpURLReactionEmojiSegment.FindAllString(buffer, -1)
-			for i := range reactionEmojis {
-				buffer = strings.ReplaceAll(buffer, reactionEmojis[i], "/reactions/{emoji}")
-			}
-		} else {
-			// corner case for urls with emojis
-			suffix := buffer[len(reactionPrefixMatch[0]):]
-			until := len(suffix)
-			for i, rune := range suffix {
-				if rune == '/' {
-					until = i
-					break
-				}
-			}
-			newSuffix := "{emoji}" + suffix[until:]
-			buffer = buffer[:len(buffer)-len(suffix)] + newSuffix
-		}
+		buffer = strings.TrimRight(reactionPrefixMatch[0], "/")
 	}
 
 	if strings.HasSuffix(buffer, "/") {
